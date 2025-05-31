@@ -1,0 +1,132 @@
+name: System Logs Automation
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Run daily at midnight UTC
+  workflow_dispatch:  # Allow manual triggering
+  push:
+    paths:
+      - 'System Logs/**'
+      - 'Core_Wrapper/logs/**'
+
+permissions:
+  contents: write
+  issues: write
+
+env:
+  LOG_RETENTION_DAYS: 30
+  MAX_LOG_SIZE_MB: 100
+  SYSTEM_LOGS_DIR: System Logs
+  CORE_LOGS_DIR: Core_Wrapper/logs
+
+jobs:
+  process-logs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history for proper log processing
+
+      - name: Setup Git
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+
+      - name: Create Archive Directory
+        run: |
+          mkdir -p "${SYSTEM_LOGS_DIR}/Archive"
+          mkdir -p "${CORE_LOGS_DIR}/Archive"
+
+      - name: Rotate Large Logs
+        run: |
+          find "$SYSTEM_LOGS_DIR" -type f -name "*.log" -size +${MAX_LOG_SIZE_MB}M | while read -r log; do
+            timestamp=$(date +%Y%m%d_%H%M%S)
+            basename=$(basename "$log")
+            mv "$log" "${SYSTEM_LOGS_DIR}/Archive/${basename%.*}_${timestamp}.log"
+          done
+
+      - name: Archive Old Logs
+        run: |
+          find "${SYSTEM_LOGS_DIR}/Archive" -type f -name "*.log" -mtime +${LOG_RETENTION_DAYS} -delete
+          find "${CORE_LOGS_DIR}/Archive" -type f -name "*.log" -mtime +${LOG_RETENTION_DAYS} -delete
+
+      - name: Update System Status
+        run: |
+          timestamp=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          {
+            echo "# System Status Update"
+            echo "Last Updated: $timestamp"
+            echo ""
+            echo "## System Metrics"
+            echo "* Disk Usage: $(df -h / | awk 'NR==2 {print $5}')"
+            echo "* Memory Usage: $(free -h | awk '/^Mem:/ {print $3"/"$2}')"
+            echo ""
+            echo "## Log Statistics"
+            echo "* Total Logs: $(find "$SYSTEM_LOGS_DIR" -type f -name "*.log" | wc -l)"
+            echo "* Archived Logs: $(find "${SYSTEM_LOGS_DIR}/Archive" -type f -name "*.log" | wc -l)"
+            echo "* Core Logs: $(find "$CORE_LOGS_DIR" -type f -name "*.log" | wc -l)"
+          } > "${SYSTEM_LOGS_DIR}/SYSTEM_STATUS.md"
+
+      - name: Generate Log Summary
+        run: |
+          {
+            echo "# Log Summary (Last 24 Hours)"
+            echo "Generated: $(date -u)"
+            echo ""
+            echo "## System Logs"
+            find "$SYSTEM_LOGS_DIR" -type f -name "*.log" -mtime -1 -exec sh -c '
+              echo "### $(basename {})"
+              echo "\`\`\`"
+              tail -n 50 {} 2>/dev/null || echo "Empty or unreadable log"
+              echo "\`\`\`"
+              echo ""
+            ' \;
+          } > "${SYSTEM_LOGS_DIR}/DAILY_SUMMARY.md"
+
+      - name: Commit and Push Changes
+        run: |
+          # Stage changes
+          git add "${SYSTEM_LOGS_DIR}/SYSTEM_STATUS.md"
+          git add "${SYSTEM_LOGS_DIR}/DAILY_SUMMARY.md"
+          git add "${SYSTEM_LOGS_DIR}/Archive"
+          git add "${CORE_LOGS_DIR}/Archive"
+
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          # Commit and push changes
+          git commit -m "Auto: Update system logs and status [skip ci]"
+          
+          # Try pushing changes
+          if ! git push; then
+            echo "::warning::Failed to push changes. Attempting to pull and retry..."
+            git pull --rebase
+            git push
+          fi
+
+      - name: Check for Issues
+        if: failure()
+        run: |
+          title="System Log Processing Failed"
+          body="The system log processing workflow failed. Please check the workflow logs for details."
+          
+          gh issue create \
+            --title "$title" \
+            --body "$body" \
+            --label "bug,automated,log-processing"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clean Up
+        if: always()
+        run: |
+          # Remove any temporary files
+          find /tmp -name "temp_log_*" -type f -delete
+          
+          # Compress any large files that weren't archived
+          find "$SYSTEM_LOGS_DIR" -type f -size +${MAX_LOG_SIZE_MB}M -exec gzip {} \;
+
