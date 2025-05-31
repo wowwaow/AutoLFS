@@ -134,3 +134,40 @@ token.json
 !Documentation/
 !docs/
 
+
+# System-specific directories
+Agent/
+Agent Status/
+Backups/
+Cloud_Sync/
+Remote_Cache/
+System Logs/*.log
+Work Logs/*.log
+
+# Build and temporary files
+artifacts/
+*.tmp
+*.temp
+*.bak
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local configuration
+config/local/
+*.local.yml
+*.local.yaml
+
+# Dependencies and build outputs
+node_modules/
+__pycache__/
+*.pyc
+venv/
+dist/
+build/
+
+# But keep essential files
+

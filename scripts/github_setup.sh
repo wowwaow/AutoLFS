@@ -59,13 +59,13 @@ check_prerequisites() {
     if ! command -v git &> /dev/null; then
         log_error "Git is not installed. Please install it first."
         exit 1
-    }
+    fi
     
     # Check gh auth status
     if ! gh auth status &> /dev/null; then
         log_error "Not authenticated with GitHub. Please run 'gh auth login' first."
         exit 1
-    }
+    fi
     
     log_success "Prerequisites check passed"
 }
