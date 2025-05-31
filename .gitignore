@@ -143,6 +143,9 @@ Cloud_Sync/
 Remote_Cache/
 System Logs/*.log
 Work Logs/*.log
+Current Objective/
+Simulation/
+implementation/
 
 # Build and temporary files
 artifacts/
