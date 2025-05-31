@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# Basic test suite for QA framework validation
+source "$(dirname "$0")/../../qa_framework.sh"
+
+# Test file operations
+test_file_operations() {
+    # Create a test file
+    local test_file="/var/lib/lfs-wrapper/qa/test_file.txt"
+    echo "test content" > "$test_file"
+    
+    # Test file existence
+    assert_file_exists "$test_file" "Test file should be created successfully"
+    
+    # Test file content
+    local content
+    content=$(cat "$test_file")
+    assert_equals "test content" "$content" "File content should match written data"
+    
+    # Test file permissions
+    assert_true "[ -r $test_file ]" "File should be readable"
+    
+    # Clean up
+    rm "$test_file"
+    assert_false "[ -f $test_file ]" "File should be removed successfully"
+}
+
+# Test environment access
+test_environment_access() {
+    # Test environment variable setting
+    export TEST_VAR="test_value"
+    assert_equals "test_value" "$TEST_VAR" "Environment variable should be set correctly"
+    
+    # Test PATH access
+    assert_true "command -v bash" "Should be able to find bash in PATH"
+    
+    # Test working directory access
+    local current_dir
+    current_dir=$(pwd)
+    assert_true "[ -d $current_dir ]" "Should have access to working directory"
+}
+
+# Test database operations
+test_database_access() {
+    # Test database file access
+    assert_file_exists "/var/lib/lfs-wrapper/qa/qa.db" "QA database should exist"
+    assert_file_exists "/var/lib/lfs-wrapper/qa/environment.db" "Environment database should exist"
+    
+    # Test database permissions
+    assert_true "[ -r /var/lib/lfs-wrapper/qa/qa.db ]" "QA database should be readable"
+    assert_true "[ -w /var/lib/lfs-wrapper/qa/qa.db ]" "QA database should be writable"
+}
+
+# Run tests
+begin_test_suite "Basic QA Framework Tests"
+run_test "File Operations" test_file_operations
+run_test "Environment Access" test_environment_access
+run_test "Database Access" test_database_access
+end_test_suite
+

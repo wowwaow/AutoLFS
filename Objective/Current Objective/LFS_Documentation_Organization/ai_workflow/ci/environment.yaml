@@ -1,0 +1,120 @@
+# Test Environment Configuration
+name: ai-workflow-test-env
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  # Python Core
+  - python=3.10
+  - pip>=23.0
+
+  # Testing Framework
+  - pytest>=7.0
+  - pytest-cov
+  - pytest-html
+  - pytest-xdist
+  - coverage
+  
+  # Code Quality
+  - pylint
+  - black
+  - flake8
+  - mypy
+  
+  # Security Testing
+  - bandit
+  - safety
+  
+  # Documentation
+  - sphinx
+  - mkdocs
+  
+  # YAML Processing
+  - pyyaml
+  - yamllint
+  
+  # Additional Dependencies
+  - requests
+  - beautifulsoup4
+  - pandas
+  - numpy
+  
+  # Development Tools
+  - ipython
+  - jupyter
+  
+  # pip packages
+  - pip:
+    # Test Requirements
+    - pytest-custom-exit-code>=0.3.0
+    - pytest-timeout>=2.1.0
+    - pytest-mock>=3.10.0
+    - pytest-benchmark>=4.0.0
+    
+    # Documentation
+    - sphinx-rtd-theme
+    - sphinx-autodoc-typehints
+    - mkdocs-material
+    
+    # Code Quality
+    - radon>=5.1.0
+    - xenon>=0.9.0
+    
+    # Reporting
+    - allure-pytest>=2.13.0
+    - pytest-reportportal>=5.1.0
+    
+    # AI/ML Dependencies
+    - tensorflow>=2.12.0
+    - torch>=2.0.0
+    - transformers>=4.28.0
+    - nltk>=3.8.0
+    
+    # Monitoring
+    - prometheus-client>=0.16.0
+    - grafana-api>=1.0.3
+
+# Environment Variables
+variables:
+  PYTHONPATH: ${PROJECT_ROOT}/ai_workflow
+  PYTHONUNBUFFERED: "1"
+  PYTEST_ADDOPTS: "--color=yes"
+  COVERAGE_FILE: ".coverage"
+
+# Test Configuration
+test_settings:
+  parallel_workers: 4
+  timeout: 300
+  retry_count: 2
+  fail_fast: true
+
+# Logging Configuration
+logging:
+  level: INFO
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  handlers:
+    - type: file
+      filename: logs/test_run.log
+      max_bytes: 10485760
+      backup_count: 5
+    - type: console
+      level: INFO
+
+# Resource Limits
+resources:
+  memory: 4G
+  cpu_count: 2
+  gpu_enabled: false
+
+# Coverage Settings
+coverage:
+  fail_under: 80
+  exclude_lines:
+    - pragma: no cover
+    - def __repr__
+    - raise NotImplementedError
+  omit:
+    - tests/*
+    - setup.py
+

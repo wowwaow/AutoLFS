@@ -1,0 +1,101 @@
+# AI Workflow Test Fixtures
+version: '1.0'
+
+# Sample Documentation Templates
+templates:
+  basic_package:
+    name: "example-package"
+    version: "1.2.3"
+    sections:
+      A1_basic_info:
+        content: |
+          Package Name: example-package
+          Version: 1.2.3
+          Release Date: 2025-05-01
+          License: MIT
+      B8_required_packages:
+        content: |
+          - gcc >= 8.0.0
+          - make >= 4.2
+          - python3 >= 3.8
+      C13_source_verification:
+        content: |
+          Checksum: abc123def456
+          GPG Key: 0xDEADBEEF
+      D19_build_environment:
+        content: |
+          export CC=gcc
+          export CFLAGS="-O2"
+
+  invalid_package:
+    name: "broken-package"
+    version: "invalid"
+    sections:
+      A1_basic_info:
+        content: |
+          Name: broken
+          # Missing required fields
+      B8_required_packages:
+        content: |
+          - invalid-dependency
+          - nonexistent-package
+
+# Test Scenarios
+scenarios:
+  validation:
+    complete_documentation:
+      template: basic_package
+      expected_result: pass
+    missing_sections:
+      template: invalid_package
+      expected_result: fail
+      expected_errors:
+        - "Missing required fields in A1_basic_info"
+        - "Invalid dependencies detected"
+
+  review:
+    technical_accuracy:
+      commands:
+        - "./configure --prefix=/usr"
+        - "make -j$(nproc)"
+        - "make install"
+      expected_result: pass
+    invalid_commands:
+        - "./configure --invalid-option"
+        - "make_invalid_target"
+      expected_result: fail
+
+  update:
+    version_change:
+      old_version: "1.2.3"
+      new_version: "1.2.4"
+      affected_sections:
+        - A1_basic_info
+        - C13_source_verification
+      expected_updates:
+        - update_version
+        - update_checksum
+        - update_changelog
+
+# Test Data
+test_data:
+  package_versions:
+    - "1.2.3"
+    - "1.2.4"
+    - "2.0.0"
+  checksums:
+    - "abc123def456"
+    - "def456abc789"
+  gpg_keys:
+    - "0xDEADBEEF"
+    - "0xFEEDBEEF"
+  dependencies:
+    gcc:
+      - "8.0.0"
+      - "9.0.0"
+      - "10.0.0"
+    python3:
+      - "3.8.0"
+      - "3.9.0"
+      - "3.10.0"
+

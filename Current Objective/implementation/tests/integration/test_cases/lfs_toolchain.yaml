@@ -1,0 +1,61 @@
+id: LFS_TEST_001
+name: LFS Toolchain Build Test
+category: LFS
+description: |
+  Validates the LFS toolchain build process, including environment setup,
+  script execution, and build verification.
+
+prerequisites:
+  - file:/mnt/lfs/sources
+  - command:gcc
+  - command:make
+  - env:LFS
+
+steps:
+  - name: Environment Setup
+    script: setup_env.sh
+    
+  - name: Create Directories
+    command: |
+      mkdir -p $LFS/tools
+      mkdir -p $LFS/sources
+      
+  - name: Download Sources
+    script: download_sources.sh
+    
+  - name: Build Binutils Pass 1
+    script: build_binutils_pass1.sh
+    
+  - name: Build GCC Pass 1
+    script: build_gcc_pass1.sh
+    
+  - name: Build Linux Headers
+    script: build_linux_headers.sh
+
+validation_steps:
+  - name: Verify Build State
+    type: build
+    phase: TOOLCHAIN
+    
+  - name: Verify System State
+    type: system
+    
+  - name: Check Performance
+    type: performance
+
+cleanup_steps:
+  - name: Clean Build Directory
+    command: rm -rf $LFS/tools/*
+    
+  - name: Clean Sources
+    command: rm -rf $LFS/sources/*
+
+expected_results:
+  file:$LFS/tools/bin/ld:
+    exists: true
+  file:$LFS/tools/bin/gcc:
+    exists: true
+  command:$LFS/tools/bin/gcc --version:
+    exit_code: "0"
+    output: "gcc version"
+

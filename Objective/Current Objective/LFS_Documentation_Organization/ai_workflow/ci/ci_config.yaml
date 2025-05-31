@@ -1,0 +1,123 @@
+# CI Pipeline Configuration for AI Workflow
+version: '1.0'
+
+# Pipeline Settings
+settings:
+  name: ai-workflow-pipeline
+  timeout: 30m
+  max_retries: 2
+  parallel_execution: true
+
+# Environment Configuration
+environment:
+  python_version: "3.10"
+  dependencies_file: environment.yaml
+  workspace:
+    setup:
+      - mkdir -p reports
+      - mkdir -p logs
+    cleanup:
+      - rm -rf .venv
+      - rm -rf __pycache__
+      - rm -rf .pytest_cache
+
+# Stages Configuration
+stages:
+  pre_test:
+    - name: environment-setup
+      script: |
+        python -m venv .venv
+        source .venv/bin/activate
+        pip install -r requirements.txt
+    - name: lint-check
+      script: |
+        pylint ai_workflow/
+        black --check ai_workflow/
+    - name: security-scan
+      script: |
+        bandit -r ai_workflow/
+        safety check
+
+  test:
+    - name: unit-tests
+      script: ./test_runner.sh
+      artifacts:
+        reports:
+          - reports/*.xml
+          - reports/*.html
+        coverage:
+          - reports/coverage/
+    - name: integration-tests
+      script: |
+        pytest integration_tests/
+        pytest --integration-mark-only
+      dependencies:
+        - unit-tests
+
+  post_test:
+    - name: quality-metrics
+      script: |
+        sonarqube-scanner
+        coverage-reporter
+    - name: documentation
+      script: |
+        sphinx-build -b html docs/ docs/_build/html
+        mkdocs build
+
+# Notifications
+notifications:
+  on_success:
+    - type: slack
+      channel: ai-workflow-ci
+  on_failure:
+    - type: slack
+      channel: ai-workflow-ci
+    - type: email
+      recipients:
+        - ai-workflow-team@example.com
+
+# Artifact Storage
+artifacts:
+  retention: 30d
+  paths:
+    - reports/
+    - logs/
+    - docs/_build/
+
+# Quality Gates
+quality_gates:
+  test_coverage:
+    minimum: 80%
+  code_quality:
+    maximum_complexity: 10
+    minimum_maintainability: B
+  security:
+    maximum_critical: 0
+    maximum_high: 0
+
+# Resource Limits
+resources:
+  cpu: 2
+  memory: 4Gi
+  timeout: 1h
+
+# Caching
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .venv/
+    - .pytest_cache/
+    - pip-cache/
+
+# Branch Configuration
+branches:
+  main:
+    stages:
+      - pre_test
+      - test
+      - post_test
+  feature/*:
+    stages:
+      - pre_test
+      - test
+

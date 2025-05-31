@@ -1,0 +1,76 @@
+#!/bin/bash
+#
+# Validation Script for binutils package
+# Chapter 5 - Preparing for the Build
+
+run_validation_checks() {
+    log_info "Running validation checks for binutils..."
+    
+    # Check for essential binaries
+    local binaries=(
+        "ar"
+        "as"
+        "ld"
+        "nm"
+        "objcopy"
+        "objdump"
+        "ranlib"
+        "strip"
+    )
+    
+    for binary in "${binaries[@]}"; do
+        if ! command -v "$binary" >/dev/null 2>&1; then
+            log_error "Required binary not found: ${binary}"
+            return 1
+        fi
+        log_debug "Found binary: ${binary}"
+    done
+    
+    # Check version
+    local version
+    version=$(ld --version | head -n1 | cut -d' ' -f4)
+    if ! version_compare "$version" "2.40.0"; then
+        log_error "Invalid binutils version: ${version} (expected >= 2.40.0)"
+        return 1
+    fi
+    
+    # Check for libraries
+    local libraries=(
+        "/usr/lib/libbfd.so"
+        "/usr/lib/libopcodes.so"
+    )
+    
+    for library in "${libraries[@]}"; do
+        if [ ! -f "$library" ]; then
+            log_error "Required library not found: ${library}"
+            return 1
+        fi
+        log_debug "Found library: ${library}"
+    done
+    
+    # Perform simple test compilation
+    local test_dir="/tmp/binutils-test"
+    mkdir -p "$test_dir"
+    cd "$test_dir" || exit 1
+    
+    cat > test.c << "EOF"
+    int main() { return 0; }
+EOF
+    
+    if ! gcc -c test.c; then
+        log_error "Test compilation failed"
+        rm -rf "$test_dir"
+        return 1
+    fi
+    
+    if ! ar rcs libtest.a test.o; then
+        log_error "Archive creation failed"
+        rm -rf "$test_dir"
+        return 1
+    fi
+    
+    rm -rf "$test_dir"
+    log_info "All validation checks passed for binutils"
+    return 0
+}
+

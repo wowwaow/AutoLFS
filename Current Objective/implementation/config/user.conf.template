@@ -1,0 +1,39 @@
+#!/bin/bash
+# LFS Build Wrapper System - User Configuration Template
+# Version: 1.0.0
+# Created: 2025-05-31
+# Description: User-specific configuration overrides
+
+#######################################
+# User Preferences
+#######################################
+
+# Build preferences
+CONFIG[MAX_PARALLEL_BUILDS]=4                          # Override parallel builds
+CONFIG[ENABLE_TESTS]=true                             # Run package tests
+CONFIG[SAVE_WORK]=true                                # Keep work directories
+
+# Logging preferences
+CONFIG[LOG_LEVEL]="DEBUG"                             # Detailed logging
+CONFIG[LOG_FORMAT]="standard"                         # Log format preference
+
+# Notification settings
+CONFIG[NOTIFY_ON_COMPLETION]=true                     # Notify when done
+CONFIG[NOTIFY_ON_ERROR]=true                         # Notify on errors
+CONFIG[NOTIFICATION_METHOD]="log"                     # How to notify
+
+# Custom paths
+CONFIG[SOURCES_DIR]="${HOME}/lfs/sources"            # Custom source location
+CONFIG[BUILD_DIR]="${HOME}/lfs/builds"               # Custom build location
+CONFIG[LOG_DIR]="${HOME}/lfs/logs"                   # Custom log location
+
+# Custom flags
+CONFIG[DEFAULT_CFLAGS]="-O2 -pipe -march=native"     # Custom CFLAGS
+CONFIG[DEFAULT_CXXFLAGS]="-O2 -pipe -march=native"   # Custom CXXFLAGS
+CONFIG[DEFAULT_MAKEFLAGS]="-j4"                      # Custom make flags
+
+# Development options
+CONFIG[DEBUG_BUILD]=false                            # Enable debug builds
+CONFIG[KEEP_SOURCES]=true                           # Keep source packages
+CONFIG[VERBOSE_OUTPUT]=true                         # Verbose build output
+

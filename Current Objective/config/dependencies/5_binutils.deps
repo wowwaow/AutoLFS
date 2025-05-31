@@ -1,0 +1,20 @@
+# Dependencies for binutils package
+# Format: one dependency per line
+
+# System Tools
+gcc
+make
+bash
+sh
+coreutils
+
+# Required Libraries
+gmp
+mpfr
+mpc
+
+# Build Tools
+bison
+flex
+texinfo
+

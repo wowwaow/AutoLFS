@@ -1,0 +1,106 @@
+{
+  "timestamp": "2025-05-31T16:33:42Z",
+  "test_suite": "system",
+  "summary": {
+    "total_tests": 24,
+    "tests_passed": 22,
+    "tests_failed": 2,
+    "total_duration_seconds": 345
+  },
+  "categories": {
+    "build_flow": {
+      "total": 6,
+      "passed": 6,
+      "failed": 0,
+      "metrics": {
+        "clean_build_success": true,
+        "incremental_build_success": true,
+        "average_build_time_seconds": 45,
+        "dependency_resolution_time_seconds": 12
+      },
+      "test_cases": {
+        "clean_build": {"status": "passed", "duration": 48},
+        "incremental_build": {"status": "passed", "duration": 22},
+        "dependency_check": {"status": "passed", "duration": 15},
+        "artifact_generation": {"status": "passed", "duration": 35},
+        "configuration_validation": {"status": "passed", "duration": 8},
+        "resource_cleanup": {"status": "passed", "duration": 5}
+      }
+    },
+    "end_to_end": {
+      "total": 8,
+      "passed": 7,
+      "failed": 1,
+      "metrics": {
+        "successful_flows": 7,
+        "failed_flows": 1,
+        "average_flow_time_seconds": 42
+      },
+      "test_cases": {
+        "user_workflow": {"status": "passed", "duration": 45},
+        "data_processing": {"status": "passed", "duration": 38},
+        "reporting_flow": {"status": "failed", "duration": 52, "error": "Timeout in report generation"},
+        "backup_restore": {"status": "passed", "duration": 65},
+        "configuration_update": {"status": "passed", "duration": 28},
+        "system_restart": {"status": "passed", "duration": 85},
+        "data_migration": {"status": "passed", "duration": 95},
+        "error_handling": {"status": "passed", "duration": 35}
+      }
+    },
+    "state_verification": {
+      "total": 6,
+      "passed": 5,
+      "failed": 1,
+      "metrics": {
+        "state_consistency_percentage": 98.5,
+        "state_transition_success_rate": 96.8
+      },
+      "test_cases": {
+        "database_state": {"status": "passed", "duration": 12},
+        "cache_consistency": {"status": "passed", "duration": 8},
+        "file_system_state": {"status": "failed", "duration": 15, "error": "Inconsistent temp directory state"},
+        "memory_state": {"status": "passed", "duration": 5},
+        "process_state": {"status": "passed", "duration": 7},
+        "network_state": {"status": "passed", "duration": 6}
+      }
+    },
+    "error_recovery": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "metrics": {
+        "average_recovery_time_seconds": 8.5,
+        "successful_recoveries": 4
+      },
+      "test_cases": {
+        "process_crash": {"status": "passed", "duration": 25},
+        "network_failure": {"status": "passed", "duration": 18},
+        "resource_exhaustion": {"status": "passed", "duration": 22},
+        "data_corruption": {"status": "passed", "duration": 28}
+      }
+    }
+  },
+  "performance_metrics": {
+    "cpu_usage": {
+      "average": 45.2,
+      "peak": 82.5,
+      "unit": "percent"
+    },
+    "memory_usage": {
+      "average": 1.8,
+      "peak": 2.4,
+      "unit": "GB"
+    },
+    "disk_io": {
+      "read_speed": 524.8,
+      "write_speed": 312.6,
+      "unit": "MB/s"
+    }
+  },
+  "environment": {
+    "os_version": "Ubuntu 22.04 LTS",
+    "cpu_cores": 8,
+    "total_memory": 16,
+    "memory_unit": "GB"
+  }
+}

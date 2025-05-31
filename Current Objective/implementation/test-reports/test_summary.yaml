@@ -1,0 +1,33 @@
+metrics:
+  average_cpu: 0
+  peak_memory: 0
+  total_duration: 0
+  total_tests: 0
+suites:
+  INTEGRATION:
+    category: INTEGRATION
+    config:
+      parallel_execution: false
+      required_coverage: 0.0
+      retry_count: 0
+      timeout_seconds: 600
+    execution_order: []
+    test_count: 0
+  UNIT:
+    category: UNIT
+    config:
+      parallel_execution: true
+      required_coverage: 90.0
+      retry_count: 0
+      timeout_seconds: 300
+    execution_order: []
+    test_count: 0
+  VALIDATION:
+    category: VALIDATION
+    config:
+      parallel_execution: false
+      required_coverage: 0.0
+      retry_count: 0
+      timeout_seconds: 1200
+    execution_order: []
+    test_count: 0

@@ -1,0 +1,67 @@
+id: BLFS_TEST_001
+name: BLFS Package Installation Test
+category: BLFS
+description: |
+  Validates the BLFS package management system, including dependency resolution,
+  configuration, building, and installation.
+
+prerequisites:
+  - file:/mnt/blfs/sources
+  - command:gcc
+  - command:make
+  - env:BLFS
+
+steps:
+  - name: Environment Setup
+    script: setup_blfs_env.sh
+    
+  - name: Configure Package Manager
+    script: configure_blfs.sh
+    
+  - name: Download Package
+    command: |
+      wget -P $BLFS/sources https://example.com/test-package-1.0.0.tar.gz
+      
+  - name: Install Dependencies
+    script: install_dependencies.sh
+    
+  - name: Build Package
+    script: build_package.sh
+    
+  - name: Install Package
+    script: install_package.sh
+
+validation_steps:
+  - name: Verify Installation
+    type: build
+    phase: SYSTEM
+    
+  - name: Verify System State
+    type: system
+    
+  - name: Create Checkpoint
+    script: create_checkpoint.sh
+    
+  - name: Verify Checkpoint
+    type: checkpoint
+    checkpoint_id: blfs_test_001
+
+cleanup_steps:
+  - name: Remove Package
+    script: remove_package.sh
+    
+  - name: Clean Sources
+    command: rm -rf $BLFS/sources/*
+    
+  - name: Clean Build Directory
+    command: rm -rf $BLFS/build/*
+
+expected_results:
+  file:/usr/local/bin/test-package:
+    exists: true
+  command:test-package --version:
+    exit_code: "0"
+    output: "1.0.0"
+  file:/usr/local/lib/libtest.so:
+    exists: true
+

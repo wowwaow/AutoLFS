@@ -1,0 +1,71 @@
+#
+# /etc/sudoers
+# Default sudoers file for BLFS
+#
+# This file MUST be edited with the 'visudo' command as root.
+# Failure to use 'visudo' may result in syntax or file permission errors
+# that prevent sudo from running.
+#
+# See the sudoers man page for the details on how to write a sudoers file.
+#
+
+# Defaults specification
+Defaults        env_reset
+Defaults        mail_badpass
+Defaults        secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Defaults        lecture=once
+Defaults        tty_tickets
+Defaults        logfile="/var/log/sudo.log"
+Defaults        log_input,log_output
+Defaults        requiretty
+Defaults        !visiblepw
+Defaults        always_set_home
+Defaults        match_group_by_gid
+Defaults        always_query_group_plugin
+Defaults        timestamp_timeout=15
+
+# Preserve specific environment variables
+Defaults        env_keep = "LANG LC_* EDITOR PAGER DISPLAY XAUTHORITY"
+
+# User privilege specification
+root    ALL=(ALL:ALL) ALL
+
+# Allow members of group wheel to execute any command
+# Note: uncomment to enable sudo access for wheel group
+# %wheel  ALL=(ALL:ALL) ALL
+
+# Allow members of group sudo to execute any command
+%sudo   ALL=(ALL:ALL) ALL
+
+# See sudoers(5) for more information on "@include" directives:
+@includedir /etc/sudoers.d
+
+# Host alias specification
+# Examples:
+#Host_Alias      WORKSTATIONS = machine1, machine2
+#Host_Alias      SERVERS = machine3, machine4
+
+# User alias specification
+# Examples:
+#User_Alias      ADMINS = user1, user2
+#User_Alias      DBA = user3, user4
+
+# Cmnd alias specification
+# Examples:
+#Cmnd_Alias      SERVICES = /sbin/service, /sbin/chkconfig
+#Cmnd_Alias      STORAGE = /sbin/fdisk, /sbin/sfdisk, /sbin/parted
+
+# Defaults for specific commands
+Defaults!SERVICES       !requiretty
+Defaults!STORAGE       !requiretty
+
+# Security policies
+Defaults        umask=0022
+Defaults        secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Defaults        env_reset
+Defaults        env_keep =  "COLORS DISPLAY HOSTNAME HISTSIZE INPUTRC KDEDIR LS_COLORS"
+Defaults        env_keep += "MAIL PS1 PS2 QTDIR USERNAME LANG LC_ADDRESS LC_CTYPE"
+Defaults        env_keep += "LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES"
+Defaults        env_keep += "LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE"
+Defaults        env_keep += "LC_TIME LC_ALL LANGUAGE LINGUAS _XKB_CHARSET XAUTHORITY"
+

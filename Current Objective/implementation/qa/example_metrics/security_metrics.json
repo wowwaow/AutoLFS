@@ -1,0 +1,32 @@
+{
+    "total_tests": 15,
+    "tests_passed": 15,
+    "tests_failed": 0,
+    "duration": 127,
+    "scans": [
+        {
+            "name": "Filesystem Scan",
+            "files": 1247,
+            "issues": 0,
+            "duration": 45,
+            "details": [
+                "No world-writable directories found",
+                "All executable files have proper ownership",
+                "No suspicious SUID/SGID binaries detected"
+            ]
+        }
+    ],
+    "tests": [
+        {
+            "name": "Injection Testing",
+            "details": [
+                "API Endpoints Tested: 12",
+                "SQL Injection Attempts: 50",
+                "Command Injection Attempts: 50",
+                "XSS Attempts: 50",
+                "Vulnerabilities Found: 0"
+            ]
+        }
+    ]
+}
+

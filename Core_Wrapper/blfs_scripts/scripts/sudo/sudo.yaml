@@ -1,0 +1,30 @@
+# BLFS Package Configuration: sudo
+package:
+  name: "sudo"
+  version: "1.9.15p5"
+  description: "Sudo allows a system administrator to delegate authority to give certain users the ability to run some commands as root or another user"
+
+build:
+  configure_options:
+    - "--prefix=/usr"
+    - "--libexecdir=/usr/lib"
+    - "--with-secure-path"
+    - "--with-all-insults"
+    - "--with-env-editor"
+    - "--with-passprompt=[sudo] password for %p: "
+    - "--with-pam"
+    - "--with-ldap"
+    - "--docdir=/usr/share/doc/sudo-1.9.15p5"
+
+dependencies:
+  required:
+    - "pam"
+    - "openldap"
+  optional:
+    - "linux-pam"
+    - "openldap"
+    - "mit-kerberos-v5"
+  build:
+    - "gcc"
+    - "make"
+    - "autoconf"
