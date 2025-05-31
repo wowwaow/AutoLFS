@@ -143,9 +143,17 @@ Cloud_Sync/
 Remote_Cache/
 System Logs/*.log
 Work Logs/*.log
-Current Objective/
 Simulation/
-implementation/
+
+# Current Objective specific ignores
+Current Objective/**/__pycache__/
+Current Objective/**/*.pyc
+Current Objective/**/venv/
+Current Objective/**/.coverage
+Current Objective/**/test-reports/
+Current Objective/**/logs/
+Current Objective/**/*.log
+Current Objective/**/*.egg-info/
 
 # Build and temporary files
 artifacts/
