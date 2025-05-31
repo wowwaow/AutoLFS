@@ -1,0 +1,104 @@
+[build-system]
+requires = ["setuptools>=45.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lfs_wrapper"
+version = "0.1.0"
+description = "Linux From Scratch (LFS) Build System Wrapper"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "WARP System", email = "warp@system.local"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: System :: Installation/Setup",
+    "Topic :: System :: Systems Administration",
+    "Operating System :: POSIX :: Linux"
+]
+dependencies = [
+    "click>=8.0.0",
+    "pyyaml>=5.4.0",
+    "tenacity>=8.0.0",
+    "loguru>=0.7.0",
+    "psutil>=5.9.0",
+    "aiofiles>=23.1.0",
+    "shellingham>=1.5.0",
+    "distro>=1.8.0"
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=3.0.0",
+    "pytest-mock>=3.6.0",
+    "pytest-asyncio>=0.21.0",
+    "coverage>=6.0.0",
+    "tox>=3.24.0"
+]
+qa = [
+    "black>=22.0.0",
+    "isort>=5.9.0",
+    "flake8>=4.0.0",
+    "mypy>=0.900",
+    "pylint>=2.12.0"
+]
+docs = [
+    "sphinx>=4.0.0",
+    "sphinx-rtd-theme>=1.0.0",
+    "myst-parser>=0.15.0"
+]
+dev = [
+    "lfs_wrapper[test,qa,docs]"
+]
+
+[project.urls]
+Homepage = "https://github.com/warp/lfs-wrapper"
+Repository = "https://github.com/warp/lfs-wrapper.git"
+Documentation = "https://github.com/warp/lfs-wrapper/docs"
+"Bug Tracker" = "https://github.com/warp/lfs-wrapper/issues"
+
+[project.scripts]
+lfs-wrapper = "lfs_wrapper.cli:main"
+
+[tool.setuptools]
+packages = ["lfs_wrapper"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --cov=lfs_wrapper --cov-report=html --cov-report=term-missing"
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["lfs_wrapper"]
+omit = ["tests/*", "setup.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:"
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py39"]
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+
