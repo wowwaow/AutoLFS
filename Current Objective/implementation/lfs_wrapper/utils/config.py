@@ -2,7 +2,7 @@
 Configuration Loading and Management
 
 This module provides utilities for loading and validating configuration files
-for the LFS wrapper system.
+for the Linux From Scratch (LFS) build system wrapper.
 
 Author: WARP System
 Created: 2025-05-31
@@ -19,11 +19,20 @@ from ..errors.error_types import ConfigError
 
 # Default configuration values
 DEFAULT_CONFIG = {
-    'storage': {
-        'chunk_size': 8 * 1024 * 1024,  # 8MB
-        'temp_dir': '/tmp/lfs_wrapper',
-        'max_retries': 3,
-        'timeout': 30
+    'build': {
+        'parallel_jobs': 1,
+        'keep_work_files': False,
+        'verify_checksums': True,
+        'fail_fast': False,
+        'retry_failed': True,
+        'max_retries': 3
+    },
+    'directories': {
+        'build_dir': '/tmp/lfs/build',
+        'source_dir': '/tmp/lfs/sources',
+        'log_dir': '/tmp/lfs/logs',
+        'temp_dir': '/tmp/lfs/temp',
+        'tools_dir': '/tmp/lfs/tools'
     },
     'logging': {
         'level': 'INFO',
@@ -32,28 +41,44 @@ DEFAULT_CONFIG = {
     },
     'metrics': {
         'enabled': True,
-        'port': 9090,
-        'path': '/metrics'
+        'collect_interval': 60,
+        'retention_days': 30
     },
     'process': {
         'max_concurrent': 4,
         'idle_timeout': 300,
-        'kill_timeout': 10
+        'kill_timeout': 10,
+        'shell': '/bin/bash'
     },
     'resources': {
         'max_memory_mb': 1024,
         'max_cpu_percent': 80,
-        'max_disk_gb': 10
+        'max_disk_gb': 10,
+        'min_free_space_gb': 5
+    },
+    'environment': {
+        'LFS': '/mnt/lfs',
+        'LFS_TGT': 'x86_64-lfs-linux-gnu',
+        'PATH': '/tools/bin:/bin:/usr/bin'
     }
 }
 
 # Configuration schema for validation
 CONFIG_SCHEMA = {
-    'storage': {
-        'chunk_size': int,
+    'build': {
+        'parallel_jobs': int,
+        'keep_work_files': bool,
+        'verify_checksums': bool,
+        'fail_fast': bool,
+        'retry_failed': bool,
+        'max_retries': int
+    },
+    'directories': {
+        'build_dir': str,
+        'source_dir': str,
+        'log_dir': str,
         'temp_dir': str,
-        'max_retries': int,
-        'timeout': (int, float)
+        'tools_dir': str
     },
     'logging': {
         'level': str,
@@ -62,18 +87,25 @@ CONFIG_SCHEMA = {
     },
     'metrics': {
         'enabled': bool,
-        'port': int,
-        'path': str
+        'collect_interval': int,
+        'retention_days': int
     },
     'process': {
         'max_concurrent': int,
         'idle_timeout': int,
-        'kill_timeout': int
+        'kill_timeout': int,
+        'shell': str
     },
     'resources': {
         'max_memory_mb': int,
         'max_cpu_percent': (int, float),
-        'max_disk_gb': (int, float)
+        'max_disk_gb': (int, float),
+        'min_free_space_gb': (int, float)
+    },
+    'environment': {
+        'LFS': str,
+        'LFS_TGT': str,
+        'PATH': str
     }
 }
 
@@ -191,17 +223,27 @@ def load_config(config_path: Optional[Union[str, Path]] = None) -> Dict[str, Any
             )
 
     # Apply environment variable overrides
+    # Apply environment variable overrides using standard LFS naming conventions
     for key in os.environ:
         if key.startswith('LFS_'):
-            config_key = key[4:].lower()
-            if '.' in config_key:
-                section, option = config_key.split('.', 1)
-                if section in config and option in config[section]:
-                    value_type = type(config[section][option])
-                    try:
-                        config[section][option] = value_type(os.environ[key])
-                    except ValueError as e:
-                        logger.warning(f"Invalid environment variable value: {key}={os.environ[key]}")
+            if key in ['LFS', 'LFS_TGT']:
+                # Special handling for core LFS environment variables
+                config['environment'][key] = os.environ[key]
+            else:
+                # Handle other LFS_* configuration variables
+                config_key = key[4:].lower()
+                if '.' in config_key:
+                    section, option = config_key.split('.', 1)
+                    if section in config and option in config[section]:
+                        value_type = type(config[section][option])
+                        try:
+                            config[section][option] = value_type(os.environ[key])
+                        except ValueError as e:
+                            logger.warning(f"Invalid environment variable value: {key}={os.environ[key]}")
+                            
+        elif key == 'PATH':
+            # Special handling for PATH to ensure tools directory is included
+            config['environment']['PATH'] = os.environ[key]
 
     # Validate final configuration
     try:
