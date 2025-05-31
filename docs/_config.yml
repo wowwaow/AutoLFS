@@ -1,0 +1,40 @@
+theme: jekyll-theme-cayman
+title: AutoLFS Documentation
+description: Automated Linux From Scratch Build System Documentation
+show_downloads: true
+google_analytics:
+markdown: GFM
+
+# Navigation structure
+nav:
+  - title: Home
+    url: /
+  - title: Getting Started
+    url: /getting-started
+  - title: Build System
+    url: /build-system
+  - title: Documentation
+    url: /documentation
+  - title: GitHub Guide
+    url: /github-guide
+
+# Site settings
+url: "https://wowwaow.github.io"
+baseurl: "/AutoLFS"
+repository: wowwaow/AutoLFS
+
+# Build settings
+plugins:
+  - jekyll-sitemap
+  - jekyll-mentions
+  - jekyll-redirect-from
+  - jekyll-seo-tag
+  - jemoji
+
+# Content settings
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+
